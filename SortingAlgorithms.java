@@ -1,14 +1,8 @@
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+
 
 public class SortingAlgorithms {
 	private static long startTime;
@@ -162,6 +156,85 @@ public class SortingAlgorithms {
 		return outputArray;
 	}
 	
+	private static void arrangeMedian(List<Integer> inputArray, int l_idx, int r_idx) {
+		int m_idx = (l_idx + r_idx)/2;
+		// find median of 3: sort among the 3 points
+		if(inputArray.get(l_idx) > inputArray.get(r_idx)) {
+			swap(inputArray, l_idx, r_idx);
+		}
+		if(inputArray.get(m_idx) < inputArray.get(l_idx)) {
+			swap(inputArray, l_idx, m_idx);	
+		}
+		if(inputArray.get(m_idx) > inputArray.get(r_idx)) {
+			swap(inputArray, m_idx, r_idx);	
+		}
+		// assign median of 3 to leftmost position
+		swap(inputArray, m_idx, l_idx);
+	}
+	
+	private static void swap(List<Integer> inputArray, int l_idx, int r_idx) {
+		Integer memVal = inputArray.get(r_idx);
+		inputArray.set(r_idx, inputArray.get(l_idx));
+		inputArray.set(l_idx, memVal);
+	}
+	
+	public static void quickSort(List<Integer> inputArray) {
+		int arrLen = inputArray.size();
+		// cannot sort array of 1 item
+		if(arrLen == 1) {
+			return;
+		}
+		quickSort(inputArray, 0, arrLen - 1);
+	}
+	
+	private static void quickSort(List<Integer> inputArray, int l_idx, int r_idx) {
+		// end recursion once pointers have met
+		if(r_idx > l_idx) {	
+			arrangeMedian(inputArray, l_idx, r_idx);
+			int pivot = partition(inputArray, l_idx, r_idx);
+			if(r_idx - l_idx > 1) {
+				//left
+				quickSort(inputArray, l_idx, pivot - 1);
+				//right
+				quickSort(inputArray, pivot + 1, r_idx);
+			}
+		}
+	}
+	
+	private static int partition(List<Integer> inputArray, int l_idx, int r_idx) {		
+		int pivot = l_idx++;
+		//don't partition without 2+ elements
+		if(r_idx <= l_idx) {
+			return r_idx;
+		}
+		for(int scan = l_idx; l_idx < r_idx && scan < inputArray.size(); scan++) {
+			while(l_idx < inputArray.size() && inputArray.get(l_idx) <= inputArray.get(pivot)) {
+				l_idx++;
+			}
+			while(r_idx > pivot && inputArray.get(r_idx) >= inputArray.get(pivot)) {
+				r_idx--;
+			}
+			if(r_idx > l_idx) {
+				swap(inputArray, l_idx, r_idx);
+			}			
+		}
+//		while(r_idx > l_idx) {
+//			while(inputArray.get(l_idx) < inputArray.get(pivot)) {
+//				l_idx++;
+//			}
+//			while(inputArray.get(r_idx) > inputArray.get(pivot)) {
+//				r_idx--;
+//			}
+//			if(r_idx > l_idx) {
+//				swap(inputArray, l_idx, r_idx);
+//			}
+//		}
+		swap(inputArray, pivot, r_idx);
+		
+		return r_idx;
+	}
+	
+	
 	public static void testArrayPerformance(int arrayLength) {
 		
 		Random rand = new Random();
@@ -170,15 +243,20 @@ public class SortingAlgorithms {
 		//Class<?> classObj = rand.getClass();
 		//Method randMethod = classObj.getDeclaredMethod("nextInt", int.class, int.class);
 		
-		ArrayList<Integer> TestIntArray = new ArrayList<>() {{
+		ArrayList<Integer> TestIntArray = new ArrayList<>()//(Arrays.asList(7, 1, 14, 13, 14, 7, 13, 13, 9, 9, 14, 12, 13, 14, 14));
+		{{
 			for(int i = 0; i < arrayLength; i++) {
-				add(rand.nextInt(i, arrayLength));
+				//add(rand.nextInt(i, arrayLength));
+				add(arrayLength-i);
 			}
 		}};
 		
 		ArrayList<Integer> OriginalArray = (ArrayList)TestIntArray.clone();
 		
-		String[] testAlgs = { "bubbleSort", "insertionSort", "selectionSort", "mergeSort" };
+		String[] testAlgs = { "bubbleSort", "insertionSort", "selectionSort", "mergeSort", "quickSort" };
+		//String[] testAlgs = {"mergeSort", "quickSort"};
+		//String[] testAlgs = { "quickSort" };
+
 		//System.out.println("Unsorted");
 		//System.out.println(TestIntArray);
 		System.out.println("Array length: " + String.valueOf(TestIntArray.size()));
@@ -196,7 +274,9 @@ public class SortingAlgorithms {
 			case "selectionSort":
 				selectionSort(TestIntArray);
 			case "mergeSort":
-				TestIntArray = (ArrayList)mergeSort(TestIntArray);				
+				TestIntArray = (ArrayList)mergeSort(TestIntArray);
+			case "quickSort":
+				quickSort(TestIntArray);
 			}
 			endTime = System.currentTimeMillis();
 
@@ -209,10 +289,12 @@ public class SortingAlgorithms {
 	}
 	
 	public static void main(String[] args) {
+		testArrayPerformance(100);
 		testArrayPerformance(500);
 		testArrayPerformance(1500);
 		testArrayPerformance(30000);
 		testArrayPerformance(50000);
 		testArrayPerformance(100000);
+		//testArrayPerformance(1000000);
 	}
 }
