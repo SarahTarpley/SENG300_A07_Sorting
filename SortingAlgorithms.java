@@ -246,16 +246,16 @@ public class SortingAlgorithms {
 		ArrayList<Integer> TestIntArray = new ArrayList<>()//(Arrays.asList(7, 1, 14, 13, 14, 7, 13, 13, 9, 9, 14, 12, 13, 14, 14));
 		{{
 			for(int i = 0; i < arrayLength; i++) {
-				//add(rand.nextInt(i, arrayLength));
-				add(arrayLength-i);
+				add(rand.nextInt(i, arrayLength));
+				//add(arrayLength-i);
 			}
 		}};
 		
 		ArrayList<Integer> OriginalArray = (ArrayList)TestIntArray.clone();
 		
-		String[] testAlgs = { "bubbleSort", "insertionSort", "selectionSort", "mergeSort", "quickSort" };
+		String[] testAlgs = { "bubbleSort", "insertionSort", "selectionSort", "mergeSort", "quickSort", "javaSort" };
 		//String[] testAlgs = {"mergeSort", "quickSort"};
-		//String[] testAlgs = { "quickSort" };
+		//String[] testAlgs = { "javaSort" };
 
 		//System.out.println("Unsorted");
 		//System.out.println(TestIntArray);
@@ -277,6 +277,8 @@ public class SortingAlgorithms {
 				TestIntArray = (ArrayList)mergeSort(TestIntArray);
 			case "quickSort":
 				quickSort(TestIntArray);
+			case "javaSort":
+				Collections.sort(TestIntArray);
 			}
 			endTime = System.currentTimeMillis();
 
